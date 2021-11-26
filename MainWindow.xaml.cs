@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InputToolbox.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,16 @@ namespace InputToolbox
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly InputRecord Recording;
         public MainWindow()
         {
+            Recording = new InputRecord();
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Recording.StartRecord();
         }
     }
 }

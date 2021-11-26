@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="InputToolbox" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="477,157,0,0" VerticalAlignment="Top" Width="101" Click="Button_Click"/>
 
     </Grid>
 </Window>

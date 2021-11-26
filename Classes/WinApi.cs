@@ -33,9 +33,10 @@ namespace InputToolbox
 
         [DllImport("user32.dll")]
         private static extern int GetAsyncKeyState(Int32 i);
-        public static bool GetKeyState(int i)
+        public static bool GetKeyState(int i, out int state)
         {
-            return GetAsyncKeyState(i) != 0;
+            state = GetAsyncKeyState(i);
+            return state != 0;
         }
 
         [DllImport("user32.dll", SetLastError = true)]
@@ -62,6 +63,10 @@ namespace InputToolbox
         {
             keybd_event((byte)button, 0, (int)value, 0);
         }
+        public static void KeyBDEvent(byte button, int value = 0)
+        {
+            keybd_event(button, 0, value, 0);
+        }
 
         [DllImport("user32.dll")]
         private static extern void mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
@@ -69,6 +74,11 @@ namespace InputToolbox
         {
             MousePoint position = GetCursorPosition();
             mouse_event((int)value, position.X, position.Y, dwData, 0);
+        }
+        public static void MouseEvent(int value, int dwData = 0)
+        {
+            MousePoint position = GetCursorPosition();
+            mouse_event(value, position.X, position.Y, dwData, 0);
         }
 
         [DllImport("user32.dll")]
@@ -92,24 +102,27 @@ namespace InputToolbox
                 SendMessage(0xffff, 0x0112, 0xF170, 2);
             }
         }
-        public static class MouseHook
+        public static class InputHook
 
         {
             public static event EventHandler<MouseEventArgs> MouseAction = delegate { };
+            public static event EventHandler<KeyBDEventArgs> KeyboardAction = delegate { };
 
             public static void Start()
             {
-                _hookID = SetHook(_proc);
-
-
+                _MhookID = SetHook(_Mproc);
+                _KhookID = SetHook(_Kproc);
             }
-            public static void stop()
+            public static void Stop()
             {
-                UnhookWindowsHookEx(_hookID);
+                UnhookWindowsHookEx(_MhookID);
+                UnhookWindowsHookEx(_KhookID);
             }
 
-            private static LowLevelMouseProc _proc = HookCallback;
-            private static IntPtr _hookID = IntPtr.Zero;
+            private static LowLevelMouseProc _Mproc = MouseHookCallback;
+            private static IntPtr _MhookID = IntPtr.Zero;
+            private static LowLevelKeyboardProc _Kproc = KeyHookCallback;
+            private static IntPtr _KhookID = IntPtr.Zero;
 
             private static IntPtr SetHook(LowLevelMouseProc proc)
             {
@@ -120,24 +133,47 @@ namespace InputToolbox
                       GetModuleHandle(curModule.ModuleName), 0);
                 }
             }
+            private static IntPtr SetHook(LowLevelKeyboardProc proc)
+            {
+                using (Process curProcess = Process.GetCurrentProcess())
+                using (ProcessModule curModule = curProcess.MainModule)
+                {
+                    return SetWindowsHookEx(WH_KEYBOARD_LL, proc,
+                      GetModuleHandle(curModule.ModuleName), 0);
+                }
+            }
 
             private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
+            private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-            private static IntPtr HookCallback(
+            private static IntPtr MouseHookCallback(
               int nCode, IntPtr wParam, IntPtr lParam)
             {
                 MouseMessages MSGTP = (MouseMessages)wParam;
                 if (nCode >= 0 && (MSGTP == MouseMessages.WM_MOUSEWHEEL || MSGTP == MouseMessages.WM_MOUSEMOVE))
                 {
                     MSLLHOOKSTRUCT hookStruct = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
-                    MouseAction(null, new MouseEventArgs(NativeMethods.GET_WHEEL_DELTA_WPARAM(hookStruct.mouseData), hookStruct.pt.x, hookStruct.pt.y));
+                    MouseAction(null, new MouseEventArgs(NativeMethods.GET_WHEEL_DELTA_WPARAM(hookStruct.mouseData), hookStruct.pt.x, hookStruct.pt.y, MSGTP));
                 }
-                return CallNextHookEx(_hookID, nCode, wParam, lParam);
+                return CallNextHookEx(_MhookID, nCode, wParam, lParam);
+            }
+
+            private static IntPtr KeyHookCallback(
+              int nCode, IntPtr wParam, IntPtr lParam)
+            {
+                int MSGTP = (int)wParam;
+                if (nCode >= 0)
+                {
+                    KBDLLHOOKSTRUCT hookStruct = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
+                    KeyboardAction(null, new KeyBDEventArgs((byte)hookStruct.vkCode, MSGTP));
+                }
+                return CallNextHookEx(_KhookID, nCode, wParam, lParam);
             }
 
             private const int WH_MOUSE_LL = 14;
+            private const int WH_KEYBOARD_LL = 13;
 
-            private enum MouseMessages
+            public enum MouseMessages
             {
                 WM_LBUTTONDOWN = 0x0201,
                 WM_LBUTTONUP = 0x0202,
@@ -163,10 +199,20 @@ namespace InputToolbox
                 public uint time;
                 public IntPtr dwExtraInfo;
             }
+            private struct KBDLLHOOKSTRUCT
+            {
+                public uint vkCode;
+                public uint scanCode;
+                public uint flags;
+                public uint time;
+                public ulong dwExtraInfo;
+            }
 
             [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
             private static extern IntPtr SetWindowsHookEx(int idHook,
               LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
+            private static extern IntPtr SetWindowsHookEx(int idHook,
+              LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
             [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
@@ -205,11 +251,23 @@ namespace InputToolbox
             public class MouseEventArgs : EventArgs
             {
                 public int Wheel, X, Y;
-                public MouseEventArgs(int wheel, int x, int y)
+                public MouseMessages MsgT;
+                public MouseEventArgs(int wheel, int x, int y, MouseMessages flag)
                 {
                     Wheel = wheel;
                     X = x;
                     Y = y;
+                    MsgT = flag;
+                }
+            }
+            public class KeyBDEventArgs : EventArgs
+            {
+                public byte Button;
+                public int State;
+                public KeyBDEventArgs(byte button, int state)
+                {
+                    Button = button;
+                    State = state;
                 }
             }
 
@@ -240,6 +298,7 @@ namespace InputToolbox
 
         public enum KeyBDdwFlags
         {
+            KEYEVENTF_KEYDOWN = 0x0000,
             KEYEVENTF_EXTENDEDKEY = 0x0001,
             KEYEVENTF_KEYUP = 0x0002
         }
