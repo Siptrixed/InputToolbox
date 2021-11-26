@@ -110,13 +110,17 @@ namespace InputToolbox
 
             public static void Start()
             {
-                _MhookID = SetHook(_Mproc);
-                _KhookID = SetHook(_Kproc);
+                if (_MhookID == IntPtr.Zero)
+                    _MhookID = SetHook(_Mproc);
+                if (_KhookID == IntPtr.Zero)
+                    _KhookID = SetHook(_Kproc);
             }
             public static void Stop()
             {
                 UnhookWindowsHookEx(_MhookID);
+                _MhookID = IntPtr.Zero;
                 UnhookWindowsHookEx(_KhookID);
+                _KhookID = IntPtr.Zero;
             }
 
             private static LowLevelMouseProc _Mproc = MouseHookCallback;
@@ -161,7 +165,7 @@ namespace InputToolbox
             private static IntPtr KeyHookCallback(
               int nCode, IntPtr wParam, IntPtr lParam)
             {
-                int MSGTP = (int)wParam;
+                KeyBDMessages MSGTP = (KeyBDMessages)wParam;
                 if (nCode >= 0)
                 {
                     KBDLLHOOKSTRUCT hookStruct = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
@@ -172,6 +176,12 @@ namespace InputToolbox
 
             private const int WH_MOUSE_LL = 14;
             private const int WH_KEYBOARD_LL = 13;
+
+            public enum KeyBDMessages
+            {
+                BUTTONDOWN = 256,
+                BUTTONUP = 257,
+            }
 
             public enum MouseMessages
             {
@@ -211,6 +221,7 @@ namespace InputToolbox
             [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
             private static extern IntPtr SetWindowsHookEx(int idHook,
               LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
+            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
             private static extern IntPtr SetWindowsHookEx(int idHook,
               LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
@@ -263,8 +274,8 @@ namespace InputToolbox
             public class KeyBDEventArgs : EventArgs
             {
                 public byte Button;
-                public int State;
-                public KeyBDEventArgs(byte button, int state)
+                public KeyBDMessages State;
+                public KeyBDEventArgs(byte button, KeyBDMessages state)
                 {
                     Button = button;
                     State = state;

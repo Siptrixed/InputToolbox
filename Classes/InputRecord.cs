@@ -24,11 +24,11 @@ namespace InputToolbox.Classes
 
         private void MouseAction(object sender, WinApi.InputHook.MouseEventArgs e)
         {
-            Console.WriteLine(e.MsgT);
+            
         }
         private void KeyboardAction(object sender, WinApi.InputHook.KeyBDEventArgs e)
         {
-            Console.WriteLine(e.State);
+            
         }
 
         public void StopRecording()
