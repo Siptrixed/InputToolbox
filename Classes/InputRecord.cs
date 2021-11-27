@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using MessagePack;
 
 namespace InputToolbox.Classes
 {
-    [DataContract(Name = "R")]
     public class InputRecord
     {
-        [DataMember(Name = "L")]
         public List<InputAction> Actions = new List<InputAction>();
 
         private static CancellationTokenSource PlayingCTS = new CancellationTokenSource();
@@ -75,33 +72,23 @@ namespace InputToolbox.Classes
             Actions.Reverse();
         }
 
-        public void Save(string filename)
+        public async void Save(string filename)
         {
-            FileStream fs = new FileStream(filename, FileMode.OpenOrCreate);
-            DataContractSerializer ser = new DataContractSerializer(typeof(InputRecord));
-            using (var writer = XmlDictionaryWriter.CreateBinaryWriter(fs))
-            {
-                ser.WriteObject(writer, this);
-            }
-            fs.Close();
+            await using FileStream fs = new(filename, FileMode.OpenOrCreate);
+            await MessagePackSerializer.SerializeAsync(fs, Actions);
         }
-        public static InputRecord Load(string filename)
+        public static async Task<InputRecord> Load(string filename)
         {
             if (!File.Exists(filename)) return new InputRecord();
             try
             {
-                using (FileStream fs = new FileStream(filename, FileMode.Open))
+                await using FileStream fs = new FileStream(filename, FileMode.Open);
+                return new InputRecord()
                 {
-                    DataContractSerializer ser = new DataContractSerializer(typeof(InputRecord));
-                    using (var reader = XmlDictionaryReader.CreateBinaryReader(fs, XmlDictionaryReaderQuotas.Max))
-                    {
-                        var ir = (InputRecord?)ser.ReadObject(reader);
-                        if (ir == null) ir = new InputRecord();
-                        return ir;
-                    }
-                }
+                    Actions = await MessagePackSerializer.DeserializeAsync<List<InputAction>>(fs)
+                };
             }
-            catch (SerializationException)
+            catch (MessagePackSerializationException)
             {
                 return new InputRecord();
             }
@@ -137,17 +124,18 @@ namespace InputToolbox.Classes
         }
     }
 
-    [DataContract(Name = "A")]
+    [MessagePackObject]
     public class InputAction
     {
-        [DataMember(Name = "D")]
-        public int Delay;
-        [DataMember(Name = "T")]
-        public ActionType Type;
-        [DataMember(Name = "X")]
-        public int Xparam;
-        [DataMember(Name = "Y")]
-        public int Yparam;
+        [Key(3)]
+        public int Delay { get; set; }
+        [Key(0)]
+        public ActionType Type { get; set; }
+        [Key(1)]
+        public int Xparam { get; set; }
+        [Key(2)]
+        public int Yparam { get; set; }
+        [MessagePack.SerializationConstructor]
         public InputAction(ActionType Type, int Xparam, int Yparam = 0, int Delay = 0)
         {
             this.Delay = Delay;
