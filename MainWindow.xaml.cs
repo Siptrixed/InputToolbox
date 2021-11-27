@@ -1,6 +1,7 @@
 ﻿using InputToolbox.Classes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,13 +25,39 @@ namespace InputToolbox
         private readonly InputRecord Recording;
         public MainWindow()
         {
-            Recording = new InputRecord();
+            Recording = InputRecord.Load("TestFile.bxml");
             InitializeComponent();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Recording.StartRecord();
+            Button Sender = sender as Button;
+            if (Sender.Content == "StartRecord")
+            {
+                Sender.Content = "StopRecord";
+                Recording.StartRecord();
+            }
+            else
+            {
+                Sender.Content = "StartRecord";
+                Recording.StopRecording();
+                Recording.Save("TestFile.bxml");
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Button Sender = sender as Button;
+            if (Sender.Content == "Play")
+            {
+                Sender.Content = "Stop";
+                Recording.Play();
+            }
+            else
+            {
+                Sender.Content = "Play";
+                Recording.Stop();
+            }
         }
     }
 }

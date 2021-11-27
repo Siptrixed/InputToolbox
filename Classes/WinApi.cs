@@ -153,8 +153,8 @@ namespace InputToolbox
             private static IntPtr MouseHookCallback(
               int nCode, IntPtr wParam, IntPtr lParam)
             {
-                MouseMessages MSGTP = (MouseMessages)wParam;
-                if (nCode >= 0 && (MSGTP == MouseMessages.WM_MOUSEWHEEL || MSGTP == MouseMessages.WM_MOUSEMOVE))
+                HookMessages MSGTP = (HookMessages)wParam;
+                if (nCode >= 0)
                 {
                     MSLLHOOKSTRUCT hookStruct = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
                     MouseAction(null, new MouseEventArgs(NativeMethods.GET_WHEEL_DELTA_WPARAM(hookStruct.mouseData), hookStruct.pt.x, hookStruct.pt.y, MSGTP));
@@ -165,7 +165,7 @@ namespace InputToolbox
             private static IntPtr KeyHookCallback(
               int nCode, IntPtr wParam, IntPtr lParam)
             {
-                KeyBDMessages MSGTP = (KeyBDMessages)wParam;
+                HookMessages MSGTP = (HookMessages)wParam;
                 if (nCode >= 0)
                 {
                     KBDLLHOOKSTRUCT hookStruct = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
@@ -177,23 +177,31 @@ namespace InputToolbox
             private const int WH_MOUSE_LL = 14;
             private const int WH_KEYBOARD_LL = 13;
 
-            public enum KeyBDMessages
+            public enum HookMessages
             {
-                BUTTONDOWN = 256,
-                BUTTONUP = 257,
-            }
-
-            public enum MouseMessages
-            {
+                KeyBD_BUTTONDOWN = 256,
+                KeyBD_BUTTONUP = 257,
                 WM_LBUTTONDOWN = 0x0201,
                 WM_LBUTTONUP = 0x0202,
                 WM_MOUSEMOVE = 0x0200,
                 WM_MOUSEWHEEL = 0x020A,
                 WM_RBUTTONDOWN = 0x0204,
-                WM_RBUTTONUP = 0x0205
+                WM_RBUTTONUP = 0x0205,
+                WM_MBUTTONDOWN = 0x0207,
+                WM_MBUTTONUP = 0x0208,
             }
+            static Dictionary<WinApi.InputHook.HookMessages, WinApi.MouseEventFlags> MMT = new Dictionary<HookMessages, MouseEventFlags> {
+                {HookMessages.WM_LBUTTONDOWN ,MouseEventFlags.LeftDown },
+                {HookMessages.WM_LBUTTONUP ,MouseEventFlags.LeftUp },
+                {HookMessages.WM_MOUSEMOVE ,MouseEventFlags.Move },
+                {HookMessages.WM_MOUSEWHEEL ,MouseEventFlags.Wheel },
+                {HookMessages.WM_RBUTTONDOWN ,MouseEventFlags.RightDown },
+                {HookMessages.WM_RBUTTONUP ,MouseEventFlags.RightUp },
+                {HookMessages.WM_MBUTTONDOWN ,MouseEventFlags.MiddleDown },
+                {HookMessages.WM_MBUTTONUP ,MouseEventFlags.MiddleUp }
+            };
 
-            [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential)]
             private struct POINT
             {
                 public int x;
@@ -262,20 +270,20 @@ namespace InputToolbox
             public class MouseEventArgs : EventArgs
             {
                 public int Wheel, X, Y;
-                public MouseMessages MsgT;
-                public MouseEventArgs(int wheel, int x, int y, MouseMessages flag)
+                public MouseEventFlags MsgT;
+                public MouseEventArgs(int wheel, int x, int y, HookMessages flag)
                 {
                     Wheel = wheel;
                     X = x;
                     Y = y;
-                    MsgT = flag;
+                    MsgT = MMT[flag];
                 }
             }
             public class KeyBDEventArgs : EventArgs
             {
                 public byte Button;
-                public KeyBDMessages State;
-                public KeyBDEventArgs(byte button, KeyBDMessages state)
+                public HookMessages State;
+                public KeyBDEventArgs(byte button, HookMessages state)
                 {
                     Button = button;
                     State = state;
