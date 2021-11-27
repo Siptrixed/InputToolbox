@@ -26,7 +26,15 @@ namespace InputToolbox
         public MainWindow()
         {
             Recording = InputRecord.Load("TestFile.bxml");
+            InputRecord.PlayEnd += InputRecord_PlayEnd;
             InitializeComponent();
+            RecordButton.Content = "StartRecord";
+            PlayButton.Content = "Play";
+        }
+
+        private void InputRecord_PlayEnd(object? sender, EventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => PlayButton.Content = "Play"));
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -40,7 +48,7 @@ namespace InputToolbox
             else
             {
                 Sender.Content = "StartRecord";
-                Recording.StopRecording();
+                Recording.StopRecording(2);
                 Recording.Save("TestFile.bxml");
             }
         }
@@ -55,7 +63,6 @@ namespace InputToolbox
             }
             else
             {
-                Sender.Content = "Play";
                 Recording.Stop();
             }
         }

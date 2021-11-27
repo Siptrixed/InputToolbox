@@ -11,10 +11,10 @@ using System.Xml;
 
 namespace InputToolbox.Classes
 {
-    [DataContract(Name = "Recording")]
+    [DataContract(Name = "R")]
     public class InputRecord
     {
-        [DataMember(Name = "ActionList")]
+        [DataMember(Name = "L")]
         public List<InputAction> Actions = new List<InputAction>();
 
         private static CancellationTokenSource PlayingCTS = new CancellationTokenSource();
@@ -24,26 +24,32 @@ namespace InputToolbox.Classes
         {
             WinApi.InputHook.KeyboardAction += KeyboardAction;
             WinApi.InputHook.MouseAction += MouseAction;
+            WriteLock = false;
         }
         public void StartRecord()
         {
-            if (WriteLock) return;
+            if (MillisM.IsRunning || WriteLock) return;
             MillisM.Start();
+            Actions.Clear();
             WinApi.InputHook.Start();
         }
-        public void StopRecording()
+        public void StopRecording(int removeLast = 0)
         {
             WinApi.InputHook.Stop();
             MillisM.Stop();
+            for (int i = 0;i < removeLast;i++)
+            {
+                Actions.RemoveAt(Actions.Count - 1);
+            }
         }
         public void Clear()
         {
             Actions.Clear();
         }
-
+        public static event EventHandler<EventArgs> PlayEnd = delegate { };
         public void Play()
         {
-            if (MillisM.IsRunning) return;
+            if (MillisM.IsRunning || WriteLock) return;
             WriteLock = true;
             CancellationToken token = PlayingCTS.Token;
             Task PlayTask = new Task(() =>
@@ -53,6 +59,7 @@ namespace InputToolbox.Classes
                     ia.RunAction(token);
                     if (token.IsCancellationRequested) break;
                 }
+                PlayEnd.Invoke(this,new EventArgs());
                 WriteLock = false;
             });
             PlayTask.Start();
@@ -62,6 +69,10 @@ namespace InputToolbox.Classes
             PlayingCTS.Cancel();
             PlayingCTS.Dispose();
             PlayingCTS = new CancellationTokenSource();
+        }
+        public void Reverse()
+        {
+            Actions.Reverse();
         }
 
         public void Save(string filename)
@@ -126,16 +137,16 @@ namespace InputToolbox.Classes
         }
     }
 
-    [DataContract(Name = "Action")]
+    [DataContract(Name = "A")]
     public class InputAction
     {
-        [DataMember(Name = "Delay")]
+        [DataMember(Name = "D")]
         public int Delay;
-        [DataMember(Name = "Type")]
+        [DataMember(Name = "T")]
         public ActionType Type;
-        [DataMember(Name = "Xparam")]
+        [DataMember(Name = "X")]
         public int Xparam;
-        [DataMember(Name = "Yparam")]
+        [DataMember(Name = "Y")]
         public int Yparam;
         public InputAction(ActionType Type, int Xparam, int Yparam = 0, int Delay = 0)
         {
