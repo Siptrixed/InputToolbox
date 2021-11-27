@@ -75,7 +75,7 @@ namespace InputToolbox.Classes
         public async void Save(string filename)
         {
             await using FileStream fs = new(filename, FileMode.OpenOrCreate);
-            await MessagePackSerializer.SerializeAsync(fs, Actions);
+            await MessagePackSerializer.SerializeAsync(fs, Actions, MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray));
         }
         public static async Task<InputRecord> Load(string filename)
         {
@@ -85,7 +85,7 @@ namespace InputToolbox.Classes
                 await using FileStream fs = new FileStream(filename, FileMode.Open);
                 return new InputRecord()
                 {
-                    Actions = await MessagePackSerializer.DeserializeAsync<List<InputAction>>(fs)
+                    Actions = await MessagePackSerializer.DeserializeAsync<List<InputAction>>(fs, MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray))
                 };
             }
             catch (MessagePackSerializationException)

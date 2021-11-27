@@ -26,11 +26,12 @@ namespace InputToolbox
         public MainWindow()
         {
             //TODO: переместиь загрузку в async метод
-            Recording = InputRecord.Load("TestFile.bxml").GetAwaiter().GetResult();
             InputRecord.PlayEnd += InputRecord_PlayEnd;
             InitializeComponent();
             RecordButton.Content = "StartRecord";
             PlayButton.Content = "Play";
+            Recording = InputRecord.Load("TestFile.bxml").GetAwaiter().GetResult();
+
         }
 
         private void InputRecord_PlayEnd(object? sender, EventArgs e)
@@ -51,6 +52,7 @@ namespace InputToolbox
                 Sender.Content = "StartRecord";
                 Recording.StopRecording(2);
                 Recording.Save("TestFile.bxml");
+                Recording.Reverse();
             }
         }
 
