@@ -25,7 +25,8 @@ namespace InputToolbox
         private readonly InputRecord Recording;
         public MainWindow()
         {
-            Recording = InputRecord.Load("TestFile.bxml");
+            //TODO: переместиь загрузку в async метод
+            Recording = InputRecord.Load("TestFile.bxml").GetAwaiter().GetResult();
             InputRecord.PlayEnd += InputRecord_PlayEnd;
             InitializeComponent();
             RecordButton.Content = "StartRecord";
