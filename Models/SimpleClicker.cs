@@ -1,14 +1,10 @@
 ﻿using InputToolbox.Import;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace InputToolbox.Models
 {
-    internal class SimpleClicker
+    internal static class SimpleClicker
     {
         private static CancellationTokenSource CTS = new();
         private static bool isRunning = false;
@@ -17,11 +13,12 @@ namespace InputToolbox.Models
             if (isRunning) return;
             isRunning = true;
             CancellationToken token = CTS.Token;
+            fps = 999 / fps;
             new Task(() =>
             {
                 while (true)
                 {
-                    token.WaitHandle.WaitOne(999 / fps);
+                    token.WaitHandle.WaitOne(fps);
                     ClickFrame(key);
                     if (token.IsCancellationRequested) break;
                 }
@@ -32,12 +29,13 @@ namespace InputToolbox.Models
             if (isRunning) return;
             isRunning = true;
             speed = (int)(speed * 6.5);
+            fps = 999 / fps;
             CancellationToken token = CTS.Token;
             new Task(() =>
             {
                 while (true)
                 {
-                    token.WaitHandle.WaitOne(999 / fps);
+                    token.WaitHandle.WaitOne(fps);
                     WinApi.MouseEvent(WinApi.MouseEventFlags.Wheel, speed);
                     if (token.IsCancellationRequested) break;
                 }
