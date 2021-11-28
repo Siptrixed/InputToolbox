@@ -76,8 +76,8 @@ public class RecordingViewModel : ObservableObject, IDisposable
     [Obsolete]
     public void TestLoad()
     {
-        using Stream stream = File.OpenRead("TestFile.bxml");
-        Recording.Actions = MessagePackSerializer.Deserialize<List<InputAction>>(stream, Options);
+        //using Stream stream = File.OpenRead("TestFile.bxml");
+        //Recording.Actions = MessagePackSerializer.Deserialize<List<InputAction>>(stream, Options);
     }
 
     private bool StartRecordEnable() => !PlayGoing && !RecordingGoing;
@@ -102,14 +102,14 @@ public class RecordingViewModel : ObservableObject, IDisposable
     private void Play()
     {
         PlayGoing = true;
-        Recording.Play();
+        //Recording.Play();
     }
 
     private bool StopEnable() => PlayGoing && !RecordingGoing;
 
     private void Stop()
     {
-        Recording.Stop();
+        //Recording.Stop();
         PlayGoing = false;
     }
 

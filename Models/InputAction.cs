@@ -27,7 +27,7 @@ public class InputAction
 
     public void RunAction(CancellationToken ct)
     {
-        ct.WaitHandle.WaitOne(Delay);
+        if(Delay != 0) ct.WaitHandle.WaitOne(Delay);
         if (ct.IsCancellationRequested) return;
         switch (Type)
         {

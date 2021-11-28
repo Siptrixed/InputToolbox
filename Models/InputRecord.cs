@@ -35,6 +35,7 @@ public class InputRecord
         WinApi.InputHook.Stop();
         MillisM.Stop();
         for (int i = 0; i < removeLast; i++) Actions.RemoveAt(Actions.Count - 1);
+        Debug.WriteLine("ActionCount:"+Actions.Count);
     }
 
     public void Clear()
@@ -49,7 +50,7 @@ public class InputRecord
         if (MillisM.IsRunning || WriteLock) return;
         WriteLock = true;
         CancellationToken token = PlayingCTS.Token;
-        Task PlayTask = new(() =>
+        new Task(() =>
         {
             foreach (InputAction ia in Actions)
             {
@@ -59,8 +60,7 @@ public class InputRecord
 
             PlayEnd.Invoke(this, new());
             WriteLock = false;
-        });
-        PlayTask.Start();
+        }).Start();
     }
 
     public void Stop()
@@ -70,20 +70,17 @@ public class InputRecord
         PlayingCTS = new();
     }
 
-    public void Reverse()
-    {
-        Actions.Reverse();
-    }
-
     private void MouseAction(object sender, WinApi.InputHook.MouseEventArgs e)
     {
         switch (e.MsgT)
         {
             case WinApi.MouseEventFlags.Move:
+                if (MillisM.ElapsedMilliseconds < 20) break;//50 FPS Max
                 Actions.Add(new(ActionType.MouseSet, e.X, e.Y, (int)MillisM.ElapsedMilliseconds));
                 MillisM.Restart();
                 break;
             default:
+                Actions.Add(new(ActionType.MouseSet, e.X, e.Y, 0));
                 Actions.Add(new(ActionType.MouseEvent, (int)e.MsgT, e.Wheel, (int)MillisM.ElapsedMilliseconds));
                 MillisM.Restart();
                 break;
@@ -92,14 +89,11 @@ public class InputRecord
 
     private void KeyboardAction(object sender, WinApi.InputHook.KeyBDEventArgs e)
     {
-        if (e.State == WinApi.InputHook.HookMessages.KeyBD_BUTTONDOWN
-            || e.State == WinApi.InputHook.HookMessages.KeyBD_BUTTONUP)
-        {
-            int Ydtm = 2;
-            if (e.State == WinApi.InputHook.HookMessages.KeyBD_BUTTONDOWN)
-                Ydtm = 0;
-            Actions.Add(new(ActionType.KeyBDEvent, e.Button, Ydtm, (int)MillisM.ElapsedMilliseconds));
-            MillisM.Restart();
-        }
+        int Ydtm = 2;
+        if (e.State == WinApi.InputHook.HookMessages.WM_KEYDOWN
+            || e.State == WinApi.InputHook.HookMessages.WM_SYSKEYDOWN)
+            Ydtm = 0;
+        Actions.Add(new(ActionType.KeyBDEvent, e.Button, Ydtm, (int)MillisM.ElapsedMilliseconds));
+        MillisM.Restart();
     }
 }

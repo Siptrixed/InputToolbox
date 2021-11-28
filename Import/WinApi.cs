@@ -376,8 +376,11 @@ internal static class WinApi
     {
         public enum HookMessages
         {
-            KeyBD_BUTTONDOWN = 256,
-            KeyBD_BUTTONUP = 257,
+            WM_KEYDOWN = 256,
+            WM_KEYUP = 257, 
+            WM_SYSKEYDOWN = 260, 
+            WM_SYSKEYUP = 261,
+
             WM_LBUTTONDOWN = 0x0201,
             WM_LBUTTONUP = 0x0202,
             WM_MOUSEMOVE = 0x0200,
@@ -475,7 +478,9 @@ internal static class WinApi
             if (nCode >= 0)
             {
                 KBDLLHOOKSTRUCT hookStruct = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
-                KeyboardAction(null, new((byte)hookStruct.vkCode, MSGTP));
+                KeyboardAction(null, 
+                    new((byte)hookStruct.vkCode, 
+                        MSGTP));
             }
 
             return CallNextHookEx(_KhookID, nCode, wParam, lParam);
