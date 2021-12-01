@@ -28,7 +28,18 @@ public class RecordingViewModel : ObservableObject, IDisposable
 
         InputRecord.PlayEnd += InputRecordOnPlayEnd;
 
+        //todo: Remove
         TestLoad();
+        Import.WinHotKey key = new(System.Windows.Input.Key.End, Import.KeyModifier.None, (d) => {
+            if (PlayGoing)
+            {
+                Stop();
+            }
+            else
+            {
+                Play();
+            }
+            });
     }
 
     public bool RecordingGoing
@@ -102,6 +113,11 @@ public class RecordingViewModel : ObservableObject, IDisposable
     private void Play()
     {
         PlayGoing = true;
+        try
+        {
+            SimpleClicker.Run(10, Import.WinApi.Vk.VK_LBUTTON);
+        }
+        catch (Exception) { }
         //Recording.Play();
     }
 
@@ -110,6 +126,11 @@ public class RecordingViewModel : ObservableObject, IDisposable
     private void Stop()
     {
         //Recording.Stop();
+        try
+        {
+            SimpleClicker.Stop();
+        }
+        catch(Exception) { }
         PlayGoing = false;
     }
 

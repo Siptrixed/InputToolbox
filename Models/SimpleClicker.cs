@@ -1,4 +1,5 @@
 ﻿using InputToolbox.Import;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,54 +7,54 @@ namespace InputToolbox.Models
 {
     internal static class SimpleClicker
     {
-        private static CancellationTokenSource CTS = new();
+        private static CancellationTokenSource CTS;
         private static bool isRunning = false;
-        public static void RunClicks(int fps, WinApi.Vk key)
+        private static PeriodicTimer Timer;
+
+        public static bool Running { get=>isRunning; }
+
+        public static void Run(int fps, WinApi.Vk key, int wspeed = 0)
         {
-            if (isRunning) return;
+            
+            if (isRunning) throw new Exception("already running");
             isRunning = true;
+            
+            Timer = new(new(TimeSpan.TicksPerSecond / fps));
+            CTS = new();
+
             CancellationToken token = CTS.Token;
-            fps = 999 / fps;
-            new Task(() =>
+            new Task(async () =>
             {
-                while (true)
+                try
                 {
-                    token.WaitHandle.WaitOne(fps);
-                    ClickFrame(key);
-                    if (token.IsCancellationRequested) break;
+                    while (await Timer.WaitForNextTickAsync(token))
+                    {
+                        ClickFrame(key, wspeed);
+                    }
                 }
-            }).Start();
-        }
-        public static void RunScroll(int fps, int speed)
-        {
-            if (isRunning) return;
-            isRunning = true;
-            speed = (int)(speed * 6.5);
-            fps = 999 / fps;
-            CancellationToken token = CTS.Token;
-            new Task(() =>
-            {
-                while (true)
+                catch (OperationCanceledException)
                 {
-                    token.WaitHandle.WaitOne(fps);
-                    WinApi.MouseEvent(WinApi.MouseEventFlags.Wheel, speed);
-                    if (token.IsCancellationRequested) break;
+                    CTS.Dispose();
+                    Timer.Dispose();
+                    isRunning = false;
                 }
             }).Start();
         }
 
         public static void Stop()
         {
+            if(!isRunning) throw new Exception("not running");
             CTS.Cancel();
-            CTS.Dispose();
-            CTS = new();
-            isRunning = false;
         }
 
-        private static void ClickFrame(WinApi.Vk key)
+        private static void ClickFrame(WinApi.Vk key, int wspeed)
         {
             switch (key)
             {
+                case WinApi.Vk.VK_UNKNOWN:
+                    if(wspeed != 0)
+                    WinApi.MouseEvent(WinApi.MouseEventFlags.Wheel, wspeed);
+                    break;
                 case WinApi.Vk.VK_LBUTTON:
                     WinApi.MouseEvent(WinApi.MouseEventFlags.LeftDown);
                     WinApi.MouseEvent(WinApi.MouseEventFlags.LeftUp);
