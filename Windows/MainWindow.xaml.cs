@@ -7,15 +7,10 @@ namespace InputToolbox;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow(
-        MainWindowViewModel viewModel0,
-        RecordingViewModel viewModel, 
-        ClickerViewModel viewModel2)
+    public MainWindow(MainWindowViewModel viewModel)
     {
-        DataContext = viewModel0;
+        DataContext = viewModel;
         InitializeComponent();
-        RecordControl.DataContext = viewModel;
-        ClickControl.DataContext  = viewModel2;
         
     }
 }

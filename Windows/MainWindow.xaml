@@ -15,10 +15,10 @@
     <Grid>
         <TabControl SelectedIndex="{Binding selectedTab}">
             <TabItem Header="Clicker">
-                <views:ClickerControl x:Name="ClickControl" DataContext="{Binding}"/>
+                <views:ClickerControl DataContext="{Binding clickerViewModel}"/>
             </TabItem>
             <TabItem Header="Recording">
-                <views:RecordingControl x:Name="RecordControl" DataContext="{Binding}"/>
+                <views:RecordingControl DataContext="{Binding recordingViewModel}"/>
             </TabItem>
             
         </TabControl>

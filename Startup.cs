@@ -6,9 +6,9 @@ public static class Startup
 {
     public static void Configure(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<RecordingViewModel>();
-        serviceCollection.AddTransient<ClickerViewModel>();
-        serviceCollection.AddTransient<MainWindowViewModel>();
+        serviceCollection.AddSingleton<RecordingViewModel>();
+        serviceCollection.AddSingleton<ClickerViewModel>();
+        serviceCollection.AddSingleton<MainWindowViewModel>();
 
         serviceCollection.AddSingleton<MainWindow>();
     }

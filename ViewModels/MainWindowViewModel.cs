@@ -10,8 +10,12 @@ namespace InputToolbox
     public class MainWindowViewModel : ObservableObject, IDisposable
     {
         internal Import.WinHotKey HotK;
-        public MainWindowViewModel()
+        public RecordingViewModel recordingViewModel { get; set; }
+        public ClickerViewModel clickerViewModel { get; set; }
+        public MainWindowViewModel(RecordingViewModel vm1, ClickerViewModel vm2)
         {
+            recordingViewModel = vm1;
+            clickerViewModel = vm2;
             HotK = new Import.WinHotKey(
                 System.Windows.Input.Key.End,
                 Import.KeyModifier.None,
@@ -23,6 +27,10 @@ namespace InputToolbox
             switch (selectedTab)
             {
                 case 0:
+                    clickerViewModel.StartCommand.Execute(default);
+                    break;
+                case 1:
+                    recordingViewModel.StartCommand.Execute(default);
                     break;
             }
         }

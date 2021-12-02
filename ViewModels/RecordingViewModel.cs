@@ -25,8 +25,6 @@ public class RecordingViewModel : ObservableObject, IDisposable
         LoadCommand = new RelayCommand(Load);
 
         InputRecord.PlayEnd += InputRecordOnPlayEnd;
-        ButtonText = BtnStartTxt;
-        RecordChecked = true;
     }
     public bool IsRunning { 
         get => isStarted;
@@ -36,9 +34,9 @@ public class RecordingViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(ButtonText));
         }
     }
-    public bool RecordChecked { get; set; }
+    public bool RecordChecked { get; set; } = true;
     public bool PlayChecked { get; set; }
-    public string ButtonText { get; private set; }
+    public string ButtonText { get; private set; } = BtnStartTxt;
     public IRelayCommand StartCommand { get; }
     public IRelayCommand SaveCommand { get; }
     public IRelayCommand LoadCommand { get; }

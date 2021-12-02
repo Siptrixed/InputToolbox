@@ -23,8 +23,6 @@ namespace InputToolbox
         public ClickerViewModel()
         {
             StartCommand = new RelayCommand(Start);
-            ButtonText = BtnStartTxt;
-            SelectedBTN = 0;
         }
         
         public bool IsRunning
@@ -37,9 +35,9 @@ namespace InputToolbox
                 OnPropertyChanged(nameof(ButtonText));
             }
         }
-        public string ButtonText { get; private set; }
-        public int FPS { get; set; }
-        public int SelectedBTN { get; set; }
+        public string ButtonText { get; private set; } = BtnStartTxt;
+        public int FPS { get; set; } = 1;
+        public int SelectedBTN { get; set; } = 0;
         public IRelayCommand StartCommand { get; }
         private void Start()
         {
