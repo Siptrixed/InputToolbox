@@ -7,7 +7,7 @@ using InputToolbox.Import;
 
 namespace InputToolbox.Models;
 
-public class InputRecord
+internal class InputRecord
 {
     private static CancellationTokenSource PlayingCTS = new();
     private static readonly Stopwatch MillisM = new();
@@ -35,7 +35,6 @@ public class InputRecord
         WinApi.InputHook.Stop();
         MillisM.Stop();
         for (int i = 0; i < removeLast; i++) Actions.RemoveAt(Actions.Count - 1);
-        Debug.WriteLine("ActionCount:"+Actions.Count);
     }
 
     public void Clear()

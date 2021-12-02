@@ -11,16 +11,33 @@
 
     <UserControl.Resources>
         <Style TargetType="Button">
-            <Setter Property="Margin" Value="5" />
+            <Setter Property="Margin" Value="5,1,5,2" />
+            <Setter Property="Height" Value="20" />
+        </Style>
+        <Style TargetType="RadioButton">
+            <Setter Property="Margin" Value="5,1,5,2" />
             <Setter Property="Width" Value="120" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="5,0,5,0" />
+            <Setter Property="Padding" Value="0,0,5,0" />
         </Style>
     </UserControl.Resources>
 
-    <StackPanel>
-        <Button Command="{Binding PlayCommand}" Content="Play" />
-        <Button Command="{Binding StopCommand}" Content="Stop" />
-        <Button Command="{Binding StartRecordCommand}" Content="Start rec" />
-        <Button Command="{Binding StopRecordCommand}" Content="Stop rec" />
-    </StackPanel>
+    <Grid HorizontalAlignment="Center" Width="120" VerticalAlignment="Center">
+        <StackPanel HorizontalAlignment="Left">
+            <RadioButton  IsChecked="{Binding RecordChecked}" Content="Record"/>
+            <RadioButton  IsChecked="{Binding PlayChecked}" Content="Play"/>
+            <Label Content="{Binding ActionsCountString}" />
+            <Button Command="{Binding StartCommand}" Content="{Binding ButtonText}" />
+            
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Right">
+            <Button Command="{Binding SaveCommand}" Content="Save" Width="35" />
+            <Button Command="{Binding LoadCommand}" Content="Load" Width="35" />
+        </StackPanel>
+    </Grid>
 
 </UserControl>

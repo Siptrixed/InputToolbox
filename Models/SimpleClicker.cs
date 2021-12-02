@@ -29,7 +29,7 @@ namespace InputToolbox.Models
                 {
                     while (await Timer.WaitForNextTickAsync(token))
                     {
-                        ClickFrame(key, wspeed);
+                        Click(key, wspeed);
                     }
                 }
                 catch (OperationCanceledException)
@@ -47,7 +47,7 @@ namespace InputToolbox.Models
             CTS.Cancel();
         }
 
-        private static void ClickFrame(WinApi.Vk key, int wspeed)
+        public static void Click(WinApi.Vk key, int wspeed = 0)
         {
             switch (key)
             {

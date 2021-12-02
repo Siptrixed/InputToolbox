@@ -12,67 +12,103 @@ namespace InputToolbox;
 
 public class RecordingViewModel : ObservableObject, IDisposable
 {
-    private static readonly MessagePackSerializerOptions Options =
-        MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
+    private const string BtnStopTxt = "Stop(END)";
+    private const string BtnStartTxt = "Start(END)";
+    internal Import.WinHotKey HotK;
 
-    private bool _playGoing;
-    private bool _recordingGoing;
-    public InputRecord Recording = new();
+    private bool isStarted;
+    private InputRecord Recording = new();
 
     public RecordingViewModel()
     {
-        StartRecordCommand = new RelayCommand(StartRecord, StartRecordEnable);
-        StopRecordCommand = new RelayCommand(StopRecord, StopRecordEnable);
-        PlayCommand = new RelayCommand(Play, PlayEnable);
-        StopCommand = new RelayCommand(Stop, StopEnable);
+        StartCommand = new RelayCommand(Start);
+        SaveCommand = new RelayCommand(Save);
+        LoadCommand = new RelayCommand(Load);
 
         InputRecord.PlayEnd += InputRecordOnPlayEnd;
-
-        //todo: Remove
-        TestLoad();
-        Import.WinHotKey key = new(System.Windows.Input.Key.End, Import.KeyModifier.None, (d) => {
-            if (PlayGoing)
+        ButtonText = BtnStartTxt;
+        RecordChecked = true;
+        OnPropertyChanged(nameof(RecordChecked));
+        HotK = new Import.WinHotKey(
+            System.Windows.Input.Key.End,
+            Import.KeyModifier.None,
+            (x) => Start());
+    }
+    public bool IsRunning { 
+        get => isStarted;
+        set { 
+            ButtonText = value ? BtnStopTxt : BtnStartTxt;
+            isStarted = value;
+            OnPropertyChanged(nameof(ButtonText));
+        }
+    }
+    public bool RecordChecked { get; set; }
+    public bool PlayChecked { get; set; }
+    public string ButtonText { get; set; }
+    public string ActionsCountString { get => string.Format("{0} moves", Recording.Actions.Count); }
+    public IRelayCommand StartCommand { get; }
+    public IRelayCommand SaveCommand { get; }
+    public IRelayCommand LoadCommand { get; }
+    private void Start()
+    {
+        if (RecordChecked)
+        {
+            if (isStarted)
             {
-                Stop();
+                Recording.StopRecording();
+                IsRunning = false;
+                OnPropertyChanged(nameof(ActionsCountString));
             }
             else
             {
-                Play();
+                Recording.StartRecord();
+                IsRunning = true;
             }
-            });
-    }
-
-    public bool RecordingGoing
-    {
-        get => _recordingGoing;
-        set
+        }
+        else if(PlayChecked)
         {
-            if (!SetProperty(ref _recordingGoing, value, nameof(RecordingGoing))) return;
-            StartRecordCommand.NotifyCanExecuteChanged();
-            StopRecordCommand.NotifyCanExecuteChanged();
-            PlayCommand.NotifyCanExecuteChanged();
-            StopCommand.NotifyCanExecuteChanged();
+            if (isStarted)
+            {
+                Recording.Stop();
+                IsRunning = false;
+            }
+            else
+            {
+                Recording.Play();
+                IsRunning = true;
+            }
         }
     }
-
-    public bool PlayGoing
+    private async void Save()
     {
-        get => _playGoing;
-        set
+        var dialog = new Microsoft.Win32.SaveFileDialog();
+        dialog.FileName = "MyRecord"; 
+        dialog.DefaultExt = ".inprec";
+        dialog.Filter = "User input record (.inprec)|*.inprec";
+        bool? result = dialog.ShowDialog();
+        if (result == true)
         {
-            if (!SetProperty(ref _playGoing, value, nameof(PlayGoing))) return;
-            StartRecordCommand.NotifyCanExecuteChanged();
-            StopRecordCommand.NotifyCanExecuteChanged();
-            PlayCommand.NotifyCanExecuteChanged();
-            StopCommand.NotifyCanExecuteChanged();
+            string filename = dialog.FileName;
+            await FilesSerialization.SaveObjToFile(filename, Recording.Actions);
         }
     }
-
-    public IRelayCommand StartRecordCommand { get; }
-    public IRelayCommand StopRecordCommand { get; }
-    public IRelayCommand PlayCommand { get; }
-    public IRelayCommand StopCommand { get; }
-
+    private void Load()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog();
+        dialog.FileName = "";
+        dialog.DefaultExt = ".inprec";
+        dialog.Filter = "User input record (.inprec)|*.inprec";
+        bool? result = dialog.ShowDialog();
+        if (result == true)
+        {
+            string filename = dialog.FileName;
+            if(FilesSerialization.TryReadObjFromFile(
+                filename,
+                out List<InputAction> acts))
+                Recording.Actions = acts;
+            OnPropertyChanged(nameof(ActionsCountString));
+        }
+    }
     public void Dispose()
     {
         InputRecord.PlayEnd -= InputRecordOnPlayEnd;
@@ -81,63 +117,8 @@ public class RecordingViewModel : ObservableObject, IDisposable
 
     private async void InputRecordOnPlayEnd(object? sender, EventArgs e)
     {
-        await Application.Current.Dispatcher.InvokeAsync(() => { PlayGoing = false; });
+        await Application.Current.Dispatcher.InvokeAsync(() => { IsRunning = false; });
     }
 
-    [Obsolete]
-    public void TestLoad()
-    {
-        //using Stream stream = File.OpenRead("TestFile.bxml");
-        //Recording.Actions = MessagePackSerializer.Deserialize<List<InputAction>>(stream, Options);
-    }
-
-    private bool StartRecordEnable() => !PlayGoing && !RecordingGoing;
-
-    private void StartRecord()
-    {
-        RecordingGoing = true;
-        Recording.StartRecord();
-    }
-
-    private bool StopRecordEnable() => RecordingGoing && !PlayGoing;
-
-    private async void StopRecord()
-    {
-        Recording.StopRecording();
-        RecordingGoing = false;
-        await TestSave();
-    }
-
-    private bool PlayEnable() => !PlayGoing && !RecordingGoing;
-
-    private void Play()
-    {
-        PlayGoing = true;
-        try
-        {
-            SimpleClicker.Run(10, Import.WinApi.Vk.VK_LBUTTON);
-        }
-        catch (Exception) { }
-        //Recording.Play();
-    }
-
-    private bool StopEnable() => PlayGoing && !RecordingGoing;
-
-    private void Stop()
-    {
-        //Recording.Stop();
-        try
-        {
-            SimpleClicker.Stop();
-        }
-        catch(Exception) { }
-        PlayGoing = false;
-    }
-
-    [Obsolete]
-    private async Task TestSave()
-    {
-        await using Stream stream = File.Create("TestFile.bxml");
-        await MessagePackSerializer.SerializeAsync(stream, Recording.Actions, Options);
-    }
+   
 }

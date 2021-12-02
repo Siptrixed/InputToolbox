@@ -338,14 +338,16 @@ internal static class WinApi
 
     public static void MouseEvent(MouseEventFlags value, int dwData = 0)
     {
-        MousePoint position = GetCursorPosition();
+        mouse_event((int)value, 0,0, dwData, 0);
+    }
+    public static void MouseEvent(MouseEventFlags value, MousePoint position, int dwData = 0)
+    {
         mouse_event((int)value, position.X, position.Y, dwData, 0);
     }
 
     public static void MouseEvent(int value, int dwData = 0)
     {
-        MousePoint position = GetCursorPosition();
-        mouse_event(value, position.X, position.Y, dwData, 0);
+        mouse_event(value, 0, 0, dwData, 0);
     }
 
     [DllImport("user32.dll")]
