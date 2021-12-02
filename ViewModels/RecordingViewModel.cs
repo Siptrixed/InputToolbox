@@ -44,7 +44,7 @@ public class RecordingViewModel : ObservableObject, IDisposable
     {
         if (RecordChecked)
         {
-            if (isStarted)
+            if (IsRunning)
             {
                 Recording.Stop();
                 IsRunning = false;
@@ -57,7 +57,7 @@ public class RecordingViewModel : ObservableObject, IDisposable
         }
         else if(PlayChecked)
         {
-            if (isStarted)
+            if (IsRunning)
             {
                 Recording.Stop();
                 IsRunning = false;

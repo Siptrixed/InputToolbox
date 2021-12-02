@@ -13,7 +13,7 @@
         WindowStartupLocation="CenterScreen" MinWidth="300" MinHeight="165"
         d:DataContext="{d:DesignInstance inputToolbox:MainWindowViewModel}">
     <Grid>
-        <TabControl SelectedIndex="{Binding selectedTab}">
+        <TabControl SelectedIndex="{Binding SelectedTab}">
             <TabItem Header="Clicker">
                 <views:ClickerControl DataContext="{Binding clickerViewModel}"/>
             </TabItem>

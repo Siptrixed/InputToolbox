@@ -21,10 +21,19 @@ namespace InputToolbox
                 Import.KeyModifier.None,
                 (x) => Start());
         }
-        public int selectedTab { get; set; }
+        private int selectedTab;
+        public int SelectedTab { 
+            get => selectedTab;
+            set {
+                if(clickerViewModel.IsRunning)
+                    clickerViewModel.StartCommand.Execute(default);
+                if (recordingViewModel.IsRunning)
+                    recordingViewModel.StartCommand.Execute(default);
+                selectedTab = value;
+            } }
         public void Start()
         {
-            switch (selectedTab)
+            switch (SelectedTab)
             {
                 case 0:
                     clickerViewModel.StartCommand.Execute(default);
