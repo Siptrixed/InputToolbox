@@ -14,7 +14,6 @@ public class RecordingViewModel : ObservableObject, IDisposable
 {
     private const string BtnStopTxt = "Stop";
     private const string BtnStartTxt = "Start";
-    internal Import.WinHotKey HotK;
 
     private bool isStarted;
     private InputRecord Recording = new();
@@ -28,11 +27,6 @@ public class RecordingViewModel : ObservableObject, IDisposable
         InputRecord.PlayEnd += InputRecordOnPlayEnd;
         ButtonText = BtnStartTxt;
         RecordChecked = true;
-        OnPropertyChanged(nameof(RecordChecked));
-        HotK = new Import.WinHotKey(
-            System.Windows.Input.Key.End,
-            Import.KeyModifier.None,
-            (x) => Start());
     }
     public bool IsRunning { 
         get => isStarted;
@@ -44,7 +38,7 @@ public class RecordingViewModel : ObservableObject, IDisposable
     }
     public bool RecordChecked { get; set; }
     public bool PlayChecked { get; set; }
-    public string ButtonText { get; set; }
+    public string ButtonText { get; private set; }
     public IRelayCommand StartCommand { get; }
     public IRelayCommand SaveCommand { get; }
     public IRelayCommand LoadCommand { get; }

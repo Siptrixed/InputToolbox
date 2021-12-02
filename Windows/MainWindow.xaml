@@ -5,18 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InputToolbox"
         xmlns:views="clr-namespace:InputToolbox.Views"
+        xmlns:inputToolbox="clr-namespace:InputToolbox"
         mc:Ignorable="d"
         Title="InputToolbox"
         Height="82"
         Width="134"
-        WindowStartupLocation="CenterScreen" MinWidth="300" MinHeight="150">
+        WindowStartupLocation="CenterScreen" MinWidth="300" MinHeight="165"
+        d:DataContext="{d:DesignInstance inputToolbox:MainWindowViewModel}">
     <Grid>
-        <TabControl>
+        <TabControl SelectedIndex="{Binding selectedTab}">
             <TabItem Header="Clicker">
-                <views:ClickerControl DataContext="{Binding}"/>
+                <views:ClickerControl x:Name="ClickControl" DataContext="{Binding}"/>
             </TabItem>
             <TabItem Header="Recording">
-                <views:RecordingControl DataContext="{Binding}"/>
+                <views:RecordingControl x:Name="RecordControl" DataContext="{Binding}"/>
             </TabItem>
             
         </TabControl>
