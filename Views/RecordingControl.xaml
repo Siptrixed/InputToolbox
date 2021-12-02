@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="InputToolbox.Views.TestUserControl"
+﻿<UserControl x:Class="InputToolbox.Views.RecordingControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:InputToolbox.Views"
              xmlns:inputToolbox="clr-namespace:InputToolbox"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="80" d:DesignWidth="120"
              d:DataContext="{d:DesignInstance inputToolbox:RecordingViewModel}" Padding="5,0,3,0">
 
     <UserControl.Resources>
@@ -16,13 +16,12 @@
         </Style>
         <Style TargetType="RadioButton">
             <Setter Property="Margin" Value="5,1,5,2" />
-            <Setter Property="Width" Value="120" />
             <Setter Property="Height" Value="20" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style TargetType="Label">
-            <Setter Property="Margin" Value="5,0,5,0" />
-            <Setter Property="Padding" Value="0,0,5,0" />
+            <Setter Property="Margin" Value="5,-2,5,0" />
+            <Setter Property="Padding" Value="5,0,5,0" />
         </Style>
     </UserControl.Resources>
 
@@ -30,9 +29,9 @@
         <StackPanel HorizontalAlignment="Left">
             <RadioButton  IsChecked="{Binding RecordChecked}" Content="Record"/>
             <RadioButton  IsChecked="{Binding PlayChecked}" Content="Play"/>
-            <Label Content="{Binding ActionsCountString}" />
-            <Button Command="{Binding StartCommand}" Content="{Binding ButtonText}" />
-            
+            <Button Command="{Binding StartCommand}" Content="{Binding ButtonText}" Width="110" />
+            <!--<Label Content="{Binding ActionsCountString}" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Padding="0,0,5,0" />
+-->
         </StackPanel>
         <StackPanel HorizontalAlignment="Right">
             <Button Command="{Binding SaveCommand}" Content="Save" Width="35" />

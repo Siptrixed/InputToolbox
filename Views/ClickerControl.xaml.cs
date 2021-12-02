@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace InputToolbox.Views
 {
     /// <summary>
-    /// Логика взаимодействия для TestUserControl.xaml
+    /// Логика взаимодействия для ClickerControl.xaml
     /// </summary>
-    public partial class TestUserControl : UserControl
+    public partial class ClickerControl : UserControl
     {
-        public TestUserControl()
+        public ClickerControl()
         {
             InitializeComponent();
         }

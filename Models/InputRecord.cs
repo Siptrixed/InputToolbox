@@ -30,13 +30,6 @@ internal class InputRecord
         WinApi.InputHook.Start();
     }
 
-    public void StopRecording(int removeLast = 0)
-    {
-        WinApi.InputHook.Stop();
-        MillisM.Stop();
-        for (int i = 0; i < removeLast; i++) Actions.RemoveAt(Actions.Count - 1);
-    }
-
     public void Clear()
     {
         Actions.Clear();
@@ -48,6 +41,7 @@ internal class InputRecord
     {
         if (MillisM.IsRunning || WriteLock) return;
         WriteLock = true;
+        PlayingCTS = new();
         CancellationToken token = PlayingCTS.Token;
         new Task(() =>
         {
@@ -64,9 +58,16 @@ internal class InputRecord
 
     public void Stop()
     {
-        PlayingCTS.Cancel();
-        PlayingCTS.Dispose();
-        PlayingCTS = new();
+        if (MillisM.IsRunning)
+        {
+            WinApi.InputHook.Stop();
+            MillisM.Stop();
+        }
+        else if (WriteLock)
+        {
+            PlayingCTS.Cancel();
+            PlayingCTS.Dispose();
+        }
     }
 
     private void MouseAction(object sender, WinApi.InputHook.MouseEventArgs e)

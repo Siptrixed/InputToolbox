@@ -7,8 +7,19 @@
         xmlns:views="clr-namespace:InputToolbox.Views"
         mc:Ignorable="d"
         Title="InputToolbox"
-        Height="200"
-        Width="300"
-        WindowStartupLocation="CenterScreen">
-    <views:TestUserControl DataContext="{Binding}"/>
+        Height="82"
+        Width="134"
+        WindowStartupLocation="CenterScreen" MinWidth="300" MinHeight="150">
+    <Grid>
+        <TabControl>
+            <TabItem Header="Clicker">
+                <views:ClickerControl DataContext="{Binding}"/>
+            </TabItem>
+            <TabItem Header="Recording">
+                <views:RecordingControl DataContext="{Binding}"/>
+            </TabItem>
+            
+        </TabControl>
+
+    </Grid>
 </Window>

@@ -12,8 +12,8 @@ namespace InputToolbox;
 
 public class RecordingViewModel : ObservableObject, IDisposable
 {
-    private const string BtnStopTxt = "Stop(END)";
-    private const string BtnStartTxt = "Start(END)";
+    private const string BtnStopTxt = "Stop";
+    private const string BtnStartTxt = "Start";
     internal Import.WinHotKey HotK;
 
     private bool isStarted;
@@ -45,7 +45,6 @@ public class RecordingViewModel : ObservableObject, IDisposable
     public bool RecordChecked { get; set; }
     public bool PlayChecked { get; set; }
     public string ButtonText { get; set; }
-    public string ActionsCountString { get => string.Format("{0} moves", Recording.Actions.Count); }
     public IRelayCommand StartCommand { get; }
     public IRelayCommand SaveCommand { get; }
     public IRelayCommand LoadCommand { get; }
@@ -55,9 +54,8 @@ public class RecordingViewModel : ObservableObject, IDisposable
         {
             if (isStarted)
             {
-                Recording.StopRecording();
+                Recording.Stop();
                 IsRunning = false;
-                OnPropertyChanged(nameof(ActionsCountString));
             }
             else
             {
@@ -106,7 +104,6 @@ public class RecordingViewModel : ObservableObject, IDisposable
                 filename,
                 out List<InputAction> acts))
                 Recording.Actions = acts;
-            OnPropertyChanged(nameof(ActionsCountString));
         }
     }
     public void Dispose()
