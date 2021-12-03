@@ -8,6 +8,7 @@ public static class Startup
     {
         serviceCollection.AddSingleton<RecordingViewModel>();
         serviceCollection.AddSingleton<ClickerViewModel>();
+        serviceCollection.AddSingleton<RemoteViewModel>();
         serviceCollection.AddSingleton<MainWindowViewModel>();
 
         serviceCollection.AddSingleton<MainWindow>();

@@ -20,6 +20,9 @@
             <TabItem Header="Recording">
                 <views:RecordingControl DataContext="{Binding recordingViewModel}"/>
             </TabItem>
+            <TabItem Header="Remote">
+                <views:RemoteControl DataContext="{Binding remoteViewModel}"/>
+            </TabItem>
             
         </TabControl>
 
