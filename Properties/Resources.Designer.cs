@@ -59,35 +59,5 @@ namespace InputToolbox.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на &lt;!DOCTYPE html&gt;
-        ///&lt;html&gt;&lt;head&gt;
-        ///&lt;title&gt;Remote Control You PC&lt;/title&gt;
-        ///&lt;meta charset=&quot;UTF-8&quot;&gt;
-        ///&lt;meta http-equiv=&quot;Cache-Control&quot; content=&quot;no-cache&quot;&gt;
-        ///&lt;meta http-equiv=&quot;Cache-Control&quot; content=&quot;private&quot;&gt;
-        ///&lt;meta name=&quot;viewport&quot; content=&quot;user-scalable=no&quot;&gt;
-        ///&lt;style&gt;
-        ///body{
-        ///	overflow: hidden;
-        ///	position: fixed;
-        ///	font-family: &apos;Gill Sans&apos;, &apos;Gill Sans MT&apos;, Calibri, &apos;Trebuchet MS&apos;, sans-serif;
-        ///	color:rgb(128, 128, 128);
-        ///	font-size: xx-large;
-        ///}
-        ///&lt;/style&gt;
-        ///&lt;script&gt;
-        ///      
-        ///  &lt;/script&gt;
-        ///&lt;/head&gt;
-        ///&lt;body scroll=&quot;no&quot;&gt;
-        ///&lt; [остаток строки не уместился]&quot;;.
-        /// </summary>
-        internal static string Remote {
-            get {
-                return ResourceManager.GetString("Remote", resourceCulture);
-            }
-        }
     }
 }

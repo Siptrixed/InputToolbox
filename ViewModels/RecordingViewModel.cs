@@ -92,10 +92,12 @@ public class RecordingViewModel : ObservableObject, IDisposable
         if (result == true)
         {
             string filename = dialog.FileName;
-            if(FilesSerialization.TryReadObjFromFile(
+            if (FilesSerialization.TryReadObjFromFile(
                 filename,
                 out List<InputAction> acts))
+            {
                 Recording.Actions = acts;
+            }
         }
     }
     public void Dispose()

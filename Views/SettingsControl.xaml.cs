@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace InputToolbox.Views
 {
     /// <summary>
-    /// Логика взаимодействия для RemoteControl.xaml
+    /// Логика взаимодействия для SettingsControl.xaml
     /// </summary>
-    public partial class RemoteControl : UserControl
+    public partial class SettingsControl : UserControl
     {
-        public RemoteControl()
+        public SettingsControl()
         {
             InitializeComponent();
         }

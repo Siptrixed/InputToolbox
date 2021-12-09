@@ -12,16 +12,13 @@ namespace InputToolbox
         internal Import.WinHotKey HotK;
         public RecordingViewModel recordingViewModel { get; set; }
         public ClickerViewModel clickerViewModel { get; set; }
-        public RemoteViewModel remoteViewModel { get; set; }
         public MainWindowViewModel(
             RecordingViewModel vm1, 
-            ClickerViewModel vm2,
-            RemoteViewModel vm3
+            ClickerViewModel vm2
             )
         {
             recordingViewModel = vm1;
             clickerViewModel = vm2;
-            remoteViewModel = vm3;
             HotK = new Import.WinHotKey(
                 System.Windows.Input.Key.End,
                 Import.KeyModifier.None,
