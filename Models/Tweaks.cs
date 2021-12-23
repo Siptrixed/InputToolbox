@@ -15,7 +15,7 @@ namespace InputToolbox.Models
         {
             WinApi.MousePoint Current = WinApi.GetCursorPosition();
             WinApi.SetCursorPos(x, y);
-            SimpleClicker.Click(WinApi.Vk.VK_LBUTTON);
+            SimpleClicker.Click(WinApi.Vk.LBUTTON);
             WinApi.SetCursorPos(Current.X,Current.Y);
         }
         public static string ReadResource(string name)

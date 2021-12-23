@@ -36,6 +36,7 @@ internal class InputRecord
     }
 
     public static event EventHandler<EventArgs> PlayEnd = delegate { };
+    public static event EventHandler<InputAction> ActionAdded = delegate { };
 
     public void Play()
     {
@@ -78,13 +79,17 @@ internal class InputRecord
                 if (MillisM.ElapsedMilliseconds < 20) break;//50 FPS Max
                 Actions.Add(new(ActionType.MouseSet, e.X, e.Y, (int)MillisM.ElapsedMilliseconds));
                 MillisM.Restart();
+                ActionAdded.Invoke(this, Actions[Actions.Count - 1]);
                 break;
             default:
                 Actions.Add(new(ActionType.MouseSet, e.X, e.Y, 0));
                 Actions.Add(new(ActionType.MouseEvent, (int)e.MsgT, e.Wheel, (int)MillisM.ElapsedMilliseconds));
                 MillisM.Restart();
+                ActionAdded.Invoke(this, Actions[Actions.Count - 2]);
+                ActionAdded.Invoke(this, Actions[Actions.Count - 1]);
                 break;
         }
+        
     }
 
     private void KeyboardAction(object sender, WinApi.InputHook.KeyBDEventArgs e)
@@ -95,5 +100,6 @@ internal class InputRecord
             Ydtm = 0;
         Actions.Add(new(ActionType.KeyBDEvent, e.Button, Ydtm, (int)MillisM.ElapsedMilliseconds));
         MillisM.Restart();
+        ActionAdded.Invoke(this, Actions[Actions.Count - 1]);
     }
 }

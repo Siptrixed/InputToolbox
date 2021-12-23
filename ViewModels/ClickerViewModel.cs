@@ -16,9 +16,9 @@ namespace InputToolbox
         private const string BtnStartTxt = "Start";
         private bool isStarted;
         private Dictionary<int, Import.WinApi.Vk> Keys = new() {
-            { 0,Import.WinApi.Vk.VK_LBUTTON },
-            { 1, Import.WinApi.Vk.VK_RBUTTON },
-            { 2, Import.WinApi.Vk.VK_MBUTTON }
+            { 0,Import.WinApi.Vk.LBUTTON },
+            { 1, Import.WinApi.Vk.RBUTTON },
+            { 2, Import.WinApi.Vk.MBUTTON }
         };
         public ClickerViewModel()
         {

@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="InputToolbox"
         Height="82"
-        Width="134"
+        Width="400"
         WindowStartupLocation="CenterScreen" MinWidth="300" MinHeight="165"
         d:DataContext="{d:DesignInstance inputToolbox:MainWindowViewModel}">
     <Grid>

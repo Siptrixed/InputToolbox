@@ -51,19 +51,19 @@ namespace InputToolbox.Models
         {
             switch (key)
             {
-                case WinApi.Vk.VK_UNKNOWN:
+                case WinApi.Vk.UNKNOWN:
                     if(wspeed != 0)
                     WinApi.MouseEvent(WinApi.MouseEventFlags.Wheel, wspeed);
                     break;
-                case WinApi.Vk.VK_LBUTTON:
+                case WinApi.Vk.LBUTTON:
                     WinApi.MouseEvent(WinApi.MouseEventFlags.LeftDown);
                     WinApi.MouseEvent(WinApi.MouseEventFlags.LeftUp);
                     break;
-                case WinApi.Vk.VK_RBUTTON:
+                case WinApi.Vk.RBUTTON:
                     WinApi.MouseEvent(WinApi.MouseEventFlags.RightDown);
                     WinApi.MouseEvent(WinApi.MouseEventFlags.RightUp);
                     break;
-                case WinApi.Vk.VK_MBUTTON:
+                case WinApi.Vk.MBUTTON:
                     WinApi.MouseEvent(WinApi.MouseEventFlags.MiddleDown);
                     WinApi.MouseEvent(WinApi.MouseEventFlags.MiddleUp);
                     break;

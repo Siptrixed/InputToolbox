@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using InputToolbox.Import;
 using MessagePack;
+using static InputToolbox.Import.WinApi;
 
 namespace InputToolbox.Models;
 
@@ -41,5 +42,16 @@ public class InputAction
                 WinApi.SetCursorPos(Xparam, Yparam);
                 break;
         }
+    }
+
+    public override string ToString()
+    {
+        return Type switch
+        {
+            ActionType.KeyBDEvent => $"{Delay} Key{(Yparam == 0 ? "Down" : "Up")} {(Vk)Xparam}",
+            ActionType.MouseEvent => $"{Delay} {(MouseEventFlags)Xparam} {(Yparam == 0 ? "" : Yparam)}",
+            ActionType.MouseSet => $"{Delay} MousePos {Xparam} {Yparam}",
+            _ => $"{Delay} UnknownType({Type}) {Xparam} {Yparam}"
+        };
     }
 }

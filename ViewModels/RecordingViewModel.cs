@@ -7,6 +7,7 @@ using InputToolbox.Models;
 using MessagePack;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 
 namespace InputToolbox;
 
@@ -25,7 +26,14 @@ public class RecordingViewModel : ObservableObject, IDisposable
         LoadCommand = new RelayCommand(Load);
 
         InputRecord.PlayEnd += InputRecordOnPlayEnd;
+        InputRecord.ActionAdded += InputActionAdded; ;
     }
+
+    private void InputActionAdded(object? sender, InputAction e)
+    {
+        Actions.Add(e);
+    }
+
     public bool IsRunning { 
         get => isStarted;
         set { 
@@ -34,6 +42,7 @@ public class RecordingViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(ButtonText));
         }
     }
+    public ObservableCollection<InputAction> Actions { get; set; } = new();
     public bool RecordChecked { get; set; } = true;
     public bool PlayChecked { get; set; }
     public string ButtonText { get; private set; } = BtnStartTxt;
@@ -53,6 +62,7 @@ public class RecordingViewModel : ObservableObject, IDisposable
             {
                 Recording.StartRecord();
                 IsRunning = true;
+                Actions.Clear();
             }
         }
         else if(PlayChecked)
@@ -98,6 +108,7 @@ public class RecordingViewModel : ObservableObject, IDisposable
             {
                 Recording.Actions = acts;
             }
+            Actions = new(Recording.Actions);
         }
     }
     public void Dispose()
